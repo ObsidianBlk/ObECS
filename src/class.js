@@ -21,11 +21,13 @@ Class.extend = function(prop){
   for (name in prop){
     prototype[name] = (typeof prop[name] == "function" && typeof _super[name] == "function" && fnTest.test(prop[name])) ?
       (function(name, fn){
-        var tmp = this._super;
-        this._super = _super[name];
-        var ret = fn.apply(this, arguments);
-        this._super = tmp;
-        return ret;
+        return function(){
+          var tmp = this._super;
+          this._super = _super[name];
+          var ret = fn.apply(this, arguments);
+          this._super = tmp;
+          return ret;
+        };
       })(name, prop[name]) : prop[name];
   }
 
