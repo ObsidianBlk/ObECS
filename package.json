@@ -1,0 +1,17 @@
+{
+  "name":"ObECS",
+  "description":"ObsidianBlk's Entity-Component-System",
+  "version":"0.0.1",
+  "author":{
+    "name":"Bryan \"ObsidianBlk\" Miller",
+    "email":"bmiller1008@gmail.com"
+  },
+  "license":"MIT",
+  "devDependencies": {
+    "browserify": "9.0.8",
+    "uglify-js":"2.4.20"
+  },
+  "scripts":{
+    "build":"node build"
+  }
+}
