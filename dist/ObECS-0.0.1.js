@@ -1,7 +1,7 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.ObECS = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 module.exports = {
   Class : require('./src/class'),
-  Signals : require('./src/signals'),
+  Signal : require('./src/signals'),
   Factory: require('./src/factory'),
   System: require('./src/system'),
   World: require('./src/world')
@@ -82,9 +82,12 @@ var Factory = module.exports = Class.extend({
         return this;
       },
 
-      finish:function(){
+      finish:function(eid){
         var e = this._entity;
         this._entity = this._factory.createEntity();
+        if (eid !== undefined){
+          this._entity.id = eid;
+        }
         return e;
       }
     });
@@ -142,7 +145,7 @@ var Factory = module.exports = Class.extend({
   defineAssemblege:function(assemblege_name, def){
     if (assemblege_name in this._assembleges){return;}
 
-    if (def === null){return;}
+    if (!def || def === null){return;}
 
     if (typeof(def) === 'object'){
       var e = def;
@@ -151,7 +154,7 @@ var Factory = module.exports = Class.extend({
         for (var i = 0; i < def.length; i++){
           a.c(def[i]);
         }
-        e = a.finish(false);
+        e = a.finish();
         delete e.id; // We don't need the ID to register the assemblage.
       }
       this._assembleges[assemblege_name] = JSON.stringify(e);
@@ -162,20 +165,28 @@ var Factory = module.exports = Class.extend({
     return new Factory.prototype.Assembler(this);
   },
 
-  createEntity:function(assemblege_name){
+  createEntity:function(assemblege_name, eid){
     assemblege_name = assemblege_name | "";
     var e = {};
     if (assemblege_name in this._assembleges){
       e = JSON.parse(this._assembleges[assemblege_name]);
     }
-    e.id = _GenerateUUID();
+    if (eid !== undefined){
+      e.id = eid;
+    } else {
+      e.id = _GenerateUUID();
+    }
     this.signalEntityCreated.emit(e);
     return e;
   },
 
-  cloneEntity:function(entity){
+  cloneEntity:function(entity, eid){
     var e = this._clone(entity);
-    e.id = _GenerateUUID();
+    if (eid !== undefined){
+      e.id = eid;
+    } else {
+      e.id = _GenerateUUID();
+    }
     this.signalEntityCreated.emit(e);
     return e;
   },

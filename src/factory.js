@@ -25,9 +25,12 @@ var Factory = module.exports = Class.extend({
         return this;
       },
 
-      finish:function(){
+      finish:function(eid){
         var e = this._entity;
         this._entity = this._factory.createEntity();
+        if (eid !== undefined){
+          this._entity.id = eid;
+        }
         return e;
       }
     });
@@ -85,7 +88,7 @@ var Factory = module.exports = Class.extend({
   defineAssemblege:function(assemblege_name, def){
     if (assemblege_name in this._assembleges){return;}
 
-    if (def === null){return;}
+    if (!def || def === null){return;}
 
     if (typeof(def) === 'object'){
       var e = def;
@@ -94,7 +97,7 @@ var Factory = module.exports = Class.extend({
         for (var i = 0; i < def.length; i++){
           a.c(def[i]);
         }
-        e = a.finish(false);
+        e = a.finish();
         delete e.id; // We don't need the ID to register the assemblage.
       }
       this._assembleges[assemblege_name] = JSON.stringify(e);
@@ -105,20 +108,28 @@ var Factory = module.exports = Class.extend({
     return new Factory.prototype.Assembler(this);
   },
 
-  createEntity:function(assemblege_name){
+  createEntity:function(assemblege_name, eid){
     assemblege_name = assemblege_name | "";
     var e = {};
     if (assemblege_name in this._assembleges){
       e = JSON.parse(this._assembleges[assemblege_name]);
     }
-    e.id = _GenerateUUID();
+    if (eid !== undefined){
+      e.id = eid;
+    } else {
+      e.id = _GenerateUUID();
+    }
     this.signalEntityCreated.emit(e);
     return e;
   },
 
-  cloneEntity:function(entity){
+  cloneEntity:function(entity, eid){
     var e = this._clone(entity);
-    e.id = _GenerateUUID();
+    if (eid !== undefined){
+      e.id = eid;
+    } else {
+      e.id = _GenerateUUID();
+    }
     this.signalEntityCreated.emit(e);
     return e;
   },
