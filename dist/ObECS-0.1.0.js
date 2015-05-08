@@ -1,13 +1,14 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.ObECS = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 module.exports = {
   Class : require('./src/class'),
-  Signal : require('./src/signals'),
+  Signal : require('./src/signal'),
+  Event: require('./src/event'),
   Factory: require('./src/factory'),
   System: require('./src/system'),
   World: require('./src/world')
 };
 
-},{"./src/class":2,"./src/factory":3,"./src/signals":4,"./src/system":5,"./src/world":6}],2:[function(require,module,exports){
+},{"./src/class":2,"./src/event":3,"./src/factory":4,"./src/signal":5,"./src/system":6,"./src/world":7}],2:[function(require,module,exports){
 /*
 * JavaScript Class Inheritance system.
 * Written by: John Resig (http://ejohn.org/blog/simple-javascript-inheritance/)
@@ -56,7 +57,34 @@ Class.extend = function(prop){
 
 },{}],3:[function(require,module,exports){
 var Class = require('./class');
-var Signal = require('./signals');
+var Signal = require('./signal');
+
+
+module.exports = Class.extend({
+  init:function(){
+    this._events = {};
+  },
+
+  listen:function(event_name, func, func_owner){
+    if (typeof(func_owner) === 'undefined'){func_owner = null;}
+    if (!(event_name in this._events)){
+      this._events[event_name] = new Signal();
+    }
+    this._events[event_name].listen(func, func_owner);
+  },
+
+  signal:function(event_name, data){
+    if (!(event_name in this._events)){
+      this._events[event_name] = new Signal();
+      // NOTE: There's no point in emitting this event NOW... we just created it!
+    } else {
+      this._events[event_name].signal(event_name, data);
+    }
+  },
+});
+
+},{"./class":2,"./signal":5}],4:[function(require,module,exports){
+var Class = require('./class');
 
 function _GenerateUUID(){
   // This method's operations are from StackOverflow response by...
@@ -176,7 +204,6 @@ var Factory = module.exports = Class.extend({
     } else {
       e.id = _GenerateUUID();
     }
-    this.signalEntityCreated.emit(e);
     return e;
   },
 
@@ -187,16 +214,8 @@ var Factory = module.exports = Class.extend({
     } else {
       e.id = _GenerateUUID();
     }
-    this.signalEntityCreated.emit(e);
     return e;
   },
-
-
-  // -------------------------------------------------------------------------------------
-  // SIGNALS...
-  // -------------------------------------------------------------------------------------
-
-  signalEntityCreated: new Signal(),
 
 
   // -------------------------------------------------------------------------------------
@@ -219,7 +238,7 @@ var Factory = module.exports = Class.extend({
 });
 
 
-},{"./class":2,"./signals":4}],4:[function(require,module,exports){
+},{"./class":2}],5:[function(require,module,exports){
 
 var Class = require('./class');
 
@@ -230,7 +249,7 @@ var Signal = module.exports = Class.extend({
     this._listeners = [];
   },
 
-  add:function(callback, cbthis){
+  listen:function(callback, cbthis){
     if (typeof(cbthis) !== 'object'){cbthis = null;}
     for(i = 0; i < this._listeners.length; i++){
       if (this._listeners[i][1] == callback){
@@ -244,7 +263,7 @@ var Signal = module.exports = Class.extend({
     return idx;
   },
 
-  remove:function(callback){
+  removeListener:function(callback){
     for(i = 0; i < this._listeners.length; i++){
       if (this._listeners[i][1] == callback){
         this._listeners.splice(i, 1);
@@ -254,7 +273,7 @@ var Signal = module.exports = Class.extend({
     return false;
   },
 
-  removeByID:function(callback_id){
+  removeListenerByID:function(callback_id){
     for(i = 0; i < this._listeners.length; i++){
       if (this._listeners[i][0] == callback_id){
         this._listeners.splice(i, 1);
@@ -264,7 +283,7 @@ var Signal = module.exports = Class.extend({
     return false;
   },
 
-  emit:function(/* arguments */){
+  signal:function(/* arguments */){
     var messages = arguments;
 
     for (i = 0; i < this._listeners.length; ++i) {
@@ -273,60 +292,46 @@ var Signal = module.exports = Class.extend({
   }
 });
 
-},{"./class":2}],5:[function(require,module,exports){
+},{"./class":2}],6:[function(require,module,exports){
 var Class = require('./class');
-var Signal = require('./signals');
-var Factory = require('./factory');
 
 var System = module.exports = Class.extend({
-  init:function(factory){
-    this._factory = null;
-    if (factory){
-      this.setFactory(factory);
+  init:function(){
+    this._world = null;
+  },
+
+  /*
+  * Called when this System is assigned to a World object.
+  */
+  assignedWorld:function(world){
+    if (this._world === null){
+      this._world = world;
+      this._world.event().listen("assign_entity", this.onAssignEntity, this);
     }
   },
 
 
-  setFactory:function(factory){
-    if (factory && ( factory instanceof Factory ) && this._factory != null){
-      this._factory = factory;
-      this._factory.signalEntityRegistered.add(this.onEntityRegistered, this);
-      this._factory.signalEntityRemoved.add(this.onEntityRemoved, this);
-    }
-  },
-
   /*
-  * This method is called by any World object this System is attached to.
-  * The argument "info", when defined, is intended to be an object containing any data the app developer required during an update call.
+  * Handler for notifying System of possible entity for assignment.
+  * NOTE: Not all entities passed are intended for this System. It's expected that each System checks in the entity is one it tracks. Multiple Systems can track the same entity.
   */
-  update:function(info){},
-
-  /*
-  * Called when this System is assigned to a World object. This method can be used for system setup operations.
-  * world is the World object which this System was assigned to.
-  */
-  assignedWorld:function(world){},
-
-  /*
-  * Called when a new entity has been assigned to the World object this System is assigned to.
-  * It is up to the System whether the given entity needs to be tracked.
-  */
-  assignEntity:function(entity){},
-
-  onEntityRegistered:function(entity){},
-  onEntityRemoved:function(entity){},
+  onAssignEntity:function(event, entity){},
 });
 
-},{"./class":2,"./factory":3,"./signals":4}],6:[function(require,module,exports){
+},{"./class":2}],7:[function(require,module,exports){
 var Class = require('./class');
-var Signal = require('./signals');
+var Event = require('./event');
 var Factory = require('./factory');
 var System = require('./system');
 
 
 var World = module.exports = Class.extend({
-  init:function(){
-    this._factory = new Factory();
+  init:function(options){
+    if (typeof(options) === 'undefined'){options = {};}
+
+    this._factory = (options.factory_class) ? new options.factory_class() : new Factory();
+    this._event = (options.event_class) ? new options.event_class() : new Event();
+
     this._systems = [];
     this._entities = {};
   },
@@ -335,23 +340,13 @@ var World = module.exports = Class.extend({
     return this._factory;
   },
 
+  event:function(){
+    return this._event;
+  },
+
   assignSystem:function(system){
     if (system && ( system instanceof System )){
-      if (system.setFactory){
-        system.setFactory(this._factory);
-      }
-      if (system.update){
-        this.signalUpdate.add(system.update, system);
-      }
-      if (system.assignEntity){
-        this.signalAssignEntity.add(system.assignEntity, system);
-      }
-      if (system.removeEntity){
-        this.signalRemoveEntity.add(system.removeEntity, system);
-      }
-      if (system.assignedWorld){
-        system.assignedWorld(this);
-      }
+      system.assignedWorld(this);
       this._systems.push(system);
     }
     return system;
@@ -361,7 +356,7 @@ var World = module.exports = Class.extend({
     if (entity && entity.id){
       if (!(entity.id in this._entities)){
         this._entities[entity.id] = entity;
-        this.signalAssignEntity.emit(entity);
+        this._event.signal("assign_entity", entity);
       }
     }
   },
@@ -370,7 +365,7 @@ var World = module.exports = Class.extend({
     if (entity && entity.id){
       if (entity.id in this._entities){
         delete this._entities[entity.id];
-        this.signalRemoveEntity.emit(entity);
+        this._event.signal("remove_entity", entity);
       }
     }
   },
@@ -390,18 +385,9 @@ var World = module.exports = Class.extend({
 
   update:function(info){
     info = info | {};
-    this.signalUpdate.emit(info);
+    this._event.signal("update", info);
   },
-
-
-  // -------------------------------------------------------------------------------------
-  // SIGNALS...
-  // -------------------------------------------------------------------------------------
-
-  signalUpdate:new Signal(),
-  signalAssignEntity:new Signal(),
-  signalRemoveEntity:new Signal(),
 });
 
-},{"./class":2,"./factory":3,"./signals":4,"./system":5}]},{},[1])(1)
+},{"./class":2,"./event":3,"./factory":4,"./system":6}]},{},[1])(1)
 });

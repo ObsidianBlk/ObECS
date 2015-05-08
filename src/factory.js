@@ -1,5 +1,4 @@
 var Class = require('./class');
-var Signal = require('./signals');
 
 function _GenerateUUID(){
   // This method's operations are from StackOverflow response by...
@@ -119,7 +118,6 @@ var Factory = module.exports = Class.extend({
     } else {
       e.id = _GenerateUUID();
     }
-    this.signalEntityCreated.emit(e);
     return e;
   },
 
@@ -130,16 +128,8 @@ var Factory = module.exports = Class.extend({
     } else {
       e.id = _GenerateUUID();
     }
-    this.signalEntityCreated.emit(e);
     return e;
   },
-
-
-  // -------------------------------------------------------------------------------------
-  // SIGNALS...
-  // -------------------------------------------------------------------------------------
-
-  signalEntityCreated: new Signal(),
 
 
   // -------------------------------------------------------------------------------------

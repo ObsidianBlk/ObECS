@@ -1,12 +1,16 @@
 var Class = require('./class');
-var Signal = require('./signals');
+var Event = require('./event');
 var Factory = require('./factory');
 var System = require('./system');
 
 
 var World = module.exports = Class.extend({
-  init:function(){
-    this._factory = new Factory();
+  init:function(options){
+    if (typeof(options) === 'undefined'){options = {};}
+
+    this._factory = (options.factory_class) ? new options.factory_class() : new Factory();
+    this._event = (options.event_class) ? new options.event_class() : new Event();
+
     this._systems = [];
     this._entities = {};
   },
@@ -15,23 +19,13 @@ var World = module.exports = Class.extend({
     return this._factory;
   },
 
+  event:function(){
+    return this._event;
+  },
+
   assignSystem:function(system){
     if (system && ( system instanceof System )){
-      if (system.setFactory){
-        system.setFactory(this._factory);
-      }
-      if (system.update){
-        this.signalUpdate.add(system.update, system);
-      }
-      if (system.assignEntity){
-        this.signalAssignEntity.add(system.assignEntity, system);
-      }
-      if (system.removeEntity){
-        this.signalRemoveEntity.add(system.removeEntity, system);
-      }
-      if (system.assignedWorld){
-        system.assignedWorld(this);
-      }
+      system.assignedWorld(this);
       this._systems.push(system);
     }
     return system;
@@ -41,7 +35,7 @@ var World = module.exports = Class.extend({
     if (entity && entity.id){
       if (!(entity.id in this._entities)){
         this._entities[entity.id] = entity;
-        this.signalAssignEntity.emit(entity);
+        this._event.signal("assign_entity", entity);
       }
     }
   },
@@ -50,7 +44,7 @@ var World = module.exports = Class.extend({
     if (entity && entity.id){
       if (entity.id in this._entities){
         delete this._entities[entity.id];
-        this.signalRemoveEntity.emit(entity);
+        this._event.signal("remove_entity", entity);
       }
     }
   },
@@ -70,15 +64,6 @@ var World = module.exports = Class.extend({
 
   update:function(info){
     info = info | {};
-    this.signalUpdate.emit(info);
+    this._event.signal("update", info);
   },
-
-
-  // -------------------------------------------------------------------------------------
-  // SIGNALS...
-  // -------------------------------------------------------------------------------------
-
-  signalUpdate:new Signal(),
-  signalAssignEntity:new Signal(),
-  signalRemoveEntity:new Signal(),
 });
