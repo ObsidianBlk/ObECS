@@ -46,7 +46,11 @@ var Signal = module.exports = Class.extend({
     var messages = arguments;
 
     for (i = 0; i < this._listeners.length; ++i) {
-      this._listeners[i][1].apply(this._listeners[i][2], messages);
+      if (this._listeners[i][2] !== null){
+        this._listeners[i][1].apply(this._listeners[i][2], messages);
+      } else {
+        this._listeners[i][1].apply(null, messages);
+      }
     }
   }
 });
