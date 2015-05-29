@@ -5,6 +5,10 @@ var System = module.exports = Class.extend({
     this._world = null;
   },
 
+  world:function(){
+    return this._world;
+  },
+
   /*
   * Called when this System is assigned to a World object.
   */
