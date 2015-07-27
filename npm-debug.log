@@ -1,0 +1,87 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/bin/npm', 'publish' ]
+2 info using npm@2.13.2
+3 info using node@v0.12.5
+4 verbose publish [ '.' ]
+5 silly cache add args [ '.', null ]
+6 verbose cache add spec .
+7 silly cache add parsed spec { raw: '.',
+7 silly cache add   scope: null,
+7 silly cache add   name: null,
+7 silly cache add   rawSpec: '.',
+7 silly cache add   spec: '/home/obsidianblk/Development/JS/ObECS',
+7 silly cache add   type: 'directory' }
+8 verbose addLocalDirectory /home/obsidianblk/.npm/ObECS/0.2.0/package.tgz not in flight; packing
+9 verbose tar pack [ '/home/obsidianblk/.npm/ObECS/0.2.0/package.tgz',
+9 verbose tar pack   '/home/obsidianblk/Development/JS/ObECS' ]
+10 verbose tarball /home/obsidianblk/.npm/ObECS/0.2.0/package.tgz
+11 verbose folder /home/obsidianblk/Development/JS/ObECS
+12 info prepublish ObECS@0.2.0
+13 verbose addLocalTarball adding from inside cache /home/obsidianblk/.npm/ObECS/0.2.0/package.tgz
+14 silly cache afterAdd ObECS@0.2.0
+15 verbose afterAdd /home/obsidianblk/.npm/ObECS/0.2.0/package/package.json not in flight; writing
+16 verbose afterAdd /home/obsidianblk/.npm/ObECS/0.2.0/package/package.json written
+17 silly publish { name: 'ObECS',
+17 silly publish   description: 'ObsidianBlk\'s Entity-Component-System',
+17 silly publish   version: '0.2.0',
+17 silly publish   author:
+17 silly publish    { name: 'Bryan "ObsidianBlk" Miller',
+17 silly publish      email: 'bmiller1008@gmail.com' },
+17 silly publish   license: 'MIT',
+17 silly publish   devDependencies: { browserify: '9.0.8', 'uglify-js': '2.4.20' },
+17 silly publish   scripts: { build: 'node build' },
+17 silly publish   gitHead: 'e1600862f79ca921e91656ab4d6dc78aa7eabf91',
+17 silly publish   readme: 'ERROR: No README data found!',
+17 silly publish   _id: 'ObECS@0.2.0',
+17 silly publish   _shasum: '09a2c0df98b9f5fefcfd018e427f4d9a74cbd53e',
+17 silly publish   _from: '.' }
+18 verbose getPublishConfig undefined
+19 silly mapToRegistry name ObECS
+20 silly mapToRegistry using default registry
+21 silly mapToRegistry registry https://registry.npmjs.org/
+22 silly mapToRegistry uri https://registry.npmjs.org/ObECS
+23 verbose publish registryBase https://registry.npmjs.org/
+24 silly publish uploading /home/obsidianblk/.npm/ObECS/0.2.0/package.tgz
+25 verbose request uri https://registry.npmjs.org/ObECS
+26 verbose request sending authorization for write operation
+27 info attempt registry request try #1 at 7:17:57 PM
+28 verbose request using bearer token for auth
+29 verbose request id e23b96ad70a9901b
+30 http request PUT https://registry.npmjs.org/ObECS
+31 http 400 https://registry.npmjs.org/ObECS
+32 verbose headers { 'content-type': 'application/json',
+32 verbose headers   'cache-control': 'max-age=60',
+32 verbose headers   'content-length': '54',
+32 verbose headers   'accept-ranges': 'bytes',
+32 verbose headers   date: 'Mon, 27 Jul 2015 23:22:16 GMT',
+32 verbose headers   via: '1.1 varnish',
+32 verbose headers   connection: 'keep-alive',
+32 verbose headers   'x-served-by': 'cache-iad2126-IAD',
+32 verbose headers   'x-cache': 'MISS',
+32 verbose headers   'x-cache-hits': '0',
+32 verbose headers   'x-timer': 'S1438039335.907482,VS0,VE1009' }
+33 verbose request invalidating /home/obsidianblk/.npm/registry.npmjs.org/ObECS on PUT
+34 error publish Failed PUT 400
+35 verbose stack Error: name can no longer contain capital letters : ObECS
+35 verbose stack     at CachingRegistryClient.<anonymous> (/usr/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:247:14)
+35 verbose stack     at Request._callback (/usr/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:170:14)
+35 verbose stack     at Request.self.callback (/usr/lib/node_modules/npm/node_modules/request/request.js:197:22)
+35 verbose stack     at Request.emit (events.js:110:17)
+35 verbose stack     at Request.<anonymous> (/usr/lib/node_modules/npm/node_modules/request/request.js:1050:14)
+35 verbose stack     at Request.emit (events.js:129:20)
+35 verbose stack     at IncomingMessage.<anonymous> (/usr/lib/node_modules/npm/node_modules/request/request.js:996:12)
+35 verbose stack     at IncomingMessage.emit (events.js:129:20)
+35 verbose stack     at _stream_readable.js:908:16
+35 verbose stack     at process._tickCallback (node.js:355:11)
+36 verbose statusCode 400
+37 verbose pkgid ObECS
+38 verbose cwd /home/obsidianblk/Development/JS/ObECS
+39 error Linux 4.0.7-2-ARCH
+40 error argv "node" "/usr/bin/npm" "publish"
+41 error node v0.12.5
+42 error npm  v2.13.2
+43 error code E400
+44 error name can no longer contain capital letters : ObECS
+45 error If you need help, you may report this error at:
+45 error     <https://github.com/npm/npm/issues>
+46 verbose exit [ 1, true ]

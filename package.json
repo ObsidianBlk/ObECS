@@ -1,5 +1,5 @@
 {
-  "name":"ObECS",
+  "name":"obecs",
   "description":"ObsidianBlk's Entity-Component-System",
   "version":"0.2.0",
   "author":{
