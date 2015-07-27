@@ -1,11 +1,20 @@
 {
   "name":"obecs",
-  "description":"ObsidianBlk's Entity-Component-System",
+  "description":"ObsidianBlk's Entity-Component-System : Lightweight Javascript Framework",
+  "keywords":[
+    "javascript",
+    "js",
+    "entity",
+    "component",
+    "system",
+    "framework"
+  ],
   "version":"0.2.0",
   "author":{
     "name":"Bryan \"ObsidianBlk\" Miller",
     "email":"bmiller1008@gmail.com"
   },
+  "homepage":"https://github.com/ObsidianBlk/ObECS",
   "license":"MIT",
   "devDependencies": {
     "browserify": "9.0.8",
