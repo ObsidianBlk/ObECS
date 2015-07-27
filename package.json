@@ -1,7 +1,7 @@
 {
   "name":"ObECS",
   "description":"ObsidianBlk's Entity-Component-System",
-  "version":"0.1.0",
+  "version":"0.2.0",
   "author":{
     "name":"Bryan \"ObsidianBlk\" Miller",
     "email":"bmiller1008@gmail.com"
