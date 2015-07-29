@@ -31,12 +31,13 @@ var System = module.exports = Class.extend({
   /** 
    * Contructor for the System class.
    *  
-   * @param world [Optional] The World object to assign to this system.
+   * @param world         [Optional] The World object to assign to this system.
+   * @param listener_list [Optional] An array of the following format: [[<event_name_string>, <callback_function>], ...]
    */
-  init:function(world){
+  init:function(world, listener_list){
     this._world = null;
     if (world !== null){
-      this.assignWorld(world);
+      this.assignWorld(world, listener_list);
     }
   },
 
@@ -44,7 +45,7 @@ var System = module.exports = Class.extend({
    * Assigns the given world object to this system and sets up event listeners (if given) if no world object is already defined.
    * NOTE: All callback functions given in the listener_list is assumed to be a function within THIS system's prototype.
    *
-   * @param world The World object to assign to this system.
+   * @param world         The World object to assign to this system.
    * @param listener_list [Optional] An array of the following format: [[<event_name_string>, <callback_function>], ...]
    */ 
   assignWorld:function(world, listener_list){
